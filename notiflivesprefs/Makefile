@@ -2,6 +2,9 @@ TARGET := iphone:clang:latest:7.0
 
 include $(THEOS)/makefiles/common.mk
 
+ARCHS = armv7 arm64 arm64e
+SDKVERSION = 13.3
+
 BUNDLE_NAME = NotifLivesPrefs
 
 $(BUNDLE_NAME)_FILES = NLVRootListController.m
