@@ -1,8 +1,8 @@
 Package: com.wrp1002.notiflives
 Name: NotifLives
-Version: 1.0.1
+Version: 1.1.0
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
+Description: Get 1UPs from notifications!
 Maintainer: Wes <wes.hamster@gmail.com>
 Author: Wes <wes.hamster@gmail.com>
 Section: Tweaks

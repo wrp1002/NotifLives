@@ -1,3 +1,4 @@
+#line 1 "Tweak.x"
 #import <Cephei/HBPreferences.h>
 #import <AudioToolbox/AudioServices.h>
 #import <objc/runtime.h>
@@ -18,7 +19,7 @@
 @end
 
 
-//	=========================== Preference vars ===========================
+
 
 BOOL enabled;
 BOOL showNotifications;
@@ -29,12 +30,12 @@ NSString *soundFileName;
 NSInteger count = 0;
 NSInteger lives = 0;
 
-//	=========================== Other vars ===========================
+
 
 int startupDelay = 10;
 HBPreferences *preferences;
 
-//	=========================== Debugging stuff ===========================
+
 
 NSString *LogTweakName = @"NotifLives";
 bool springboardReady = false;
@@ -51,7 +52,7 @@ UIWindow* GetKeyWindow() {
     return foundWindow;
 }
 
-//	Shows an alert box. Used for debugging 
+
 void ShowAlert(NSString *msg, NSString *title) {
 	if (!springboardReady) return;
 
@@ -60,36 +61,36 @@ void ShowAlert(NSString *msg, NSString *title) {
                                  message:msg
                                  preferredStyle:UIAlertControllerStyleAlert];
 
-    //Add Buttons
+    
     UIAlertAction* dismissButton = [UIAlertAction
                                 actionWithTitle:@"Cool!"
                                 style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction * action) {
-                                    //Handle dismiss button action here
+                                    
 									
                                 }];
 
-    //Add your buttons to alert controller
+    
     [alert addAction:dismissButton];
 
     [GetKeyWindow().rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
-//	Show log with tweak name as prefix for easy grep
+
 void Log(NSString *msg) {
 	NSLog(@"%@: %@", LogTweakName, msg);
 }
 
-//	Log exception info
+
 void LogException(NSException *e) {
 	NSLog(@"%@: NSException caught", LogTweakName);
 	NSLog(@"%@: Name:%@", LogTweakName, e.name);
 	NSLog(@"%@: Reason:%@", LogTweakName, e.reason);
-	//ShowAlert(@"TVLock Crash Avoided!", @"Alert");
+	
 }
 
 
-//	=========================== Classes / Functions ===========================
+
 
 void SaveCount() {
 	Log(@"Saving count");
@@ -112,7 +113,7 @@ void UpdateLives() {
 		lives++;
 
 		if (showNotifications) {
-			count--;	//	Dont let this notification count towards lives
+			count--;	
 
 			[[objc_getClass("JBBulletinManager") sharedInstance] showBulletinWithTitle:@"1UP!" message:[NSString stringWithFormat:@"Lives: %li", (long)lives] overrideBundleImage:(UIImage *)[UIImage imageNamed:@"/Library/NotifLives/Images/icon.png"] soundPath:[NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName]];
 		}
@@ -140,15 +141,40 @@ void UpdateLives() {
 }
 
 
-//	=========================== Hooks ===========================
 
-%group Hooks
 
-	%hook SpringBoard
 
-		//	Called when springboard is finished launching
-		-(void)applicationDidFinishLaunching:(id)application {
-			%orig;
+#include <substrate.h>
+#if defined(__clang__)
+#if __has_feature(objc_arc)
+#define _LOGOS_SELF_TYPE_NORMAL __unsafe_unretained
+#define _LOGOS_SELF_TYPE_INIT __attribute__((ns_consumed))
+#define _LOGOS_SELF_CONST const
+#define _LOGOS_RETURN_RETAINED __attribute__((ns_returns_retained))
+#else
+#define _LOGOS_SELF_TYPE_NORMAL
+#define _LOGOS_SELF_TYPE_INIT
+#define _LOGOS_SELF_CONST
+#define _LOGOS_RETURN_RETAINED
+#endif
+#else
+#define _LOGOS_SELF_TYPE_NORMAL
+#define _LOGOS_SELF_TYPE_INIT
+#define _LOGOS_SELF_CONST
+#define _LOGOS_RETURN_RETAINED
+#endif
+
+@class SBCCDoNotDisturbSetting; @class SpringBoard; @class NCNotificationMasterList; 
+
+
+#line 145 "Tweak.x"
+static void (*_logos_orig$Hooks$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$Hooks$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$)(_LOGOS_SELF_TYPE_NORMAL SBCCDoNotDisturbSetting* _LOGOS_SELF_CONST, SEL, BOOL, BOOL, unsigned long long); static void _logos_method$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$(_LOGOS_SELF_TYPE_NORMAL SBCCDoNotDisturbSetting* _LOGOS_SELF_CONST, SEL, BOOL, BOOL, unsigned long long); 
+
+	
+
+		
+		static void _logos_method$Hooks$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id application) {
+			_logos_orig$Hooks$SpringBoard$applicationDidFinishLaunching$(self, _cmd, application);
 
 			Log([NSString stringWithFormat:@"============== %@ started ==============", LogTweakName]);
 
@@ -156,37 +182,37 @@ void UpdateLives() {
 			springboardReady = true;
 		}
 
-	%end
+	
 
-	%hook SBCCDoNotDisturbSetting
+	
 
-	-(void)_setDNDEnabled:(BOOL)arg1 updateServer:(BOOL)arg2 source:(unsigned long long)arg3
-	{
+
+	static void _logos_method$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$(_LOGOS_SELF_TYPE_NORMAL SBCCDoNotDisturbSetting* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, BOOL arg1, BOOL arg2, unsigned long long arg3) {
 		Log([NSString stringWithFormat:@"Enabled:%d", arg1]);
-		%orig;
+		_logos_orig$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$(self, _cmd, arg1, arg2, arg3);
 	}
 
-	%end
+	
 
-%end
 
-//	Delay this hook so that notifications from before respringing do not trigger new lives
-%group DelayedHooks
 
-	%hook NCNotificationMasterList
-		- (void)insertNotificationRequest:(id)arg1 {
-			%orig;
+
+static void (*_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$)(_LOGOS_SELF_TYPE_NORMAL NCNotificationMasterList* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$(_LOGOS_SELF_TYPE_NORMAL NCNotificationMasterList* _LOGOS_SELF_CONST, SEL, id); 
+
+	
+		static void _logos_method$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$(_LOGOS_SELF_TYPE_NORMAL NCNotificationMasterList* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id arg1) {
+			_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$(self, _cmd, arg1);
 			Log(@"- (void)insertNotificationRequest:(id)arg1;");
 			UpdateLives();
 		}
-	%end
-
-%end
+	
 
 
-//	=========================== Constructor stuff ===========================
 
-%ctor {
+
+
+
+static __attribute__((constructor)) void _logosLocalCtor_7fbd77b1(int __unused argc, char __unused **argv, char __unused **envp) {
 	preferences = [[HBPreferences alloc] initWithIdentifier:kIdentifier];
 
 	if ((NSString *)[preferences objectForKey:@"kSoundFile"] == nil)
@@ -204,10 +230,10 @@ void UpdateLives() {
 
 	[preferences registerObject:&soundFileName default:@"Powerup.wav" forKey:@"kSoundFile"];
 
-	%init(Hooks);
+	{Class _logos_class$Hooks$SpringBoard = objc_getClass("SpringBoard"); { MSHookMessageEx(_logos_class$Hooks$SpringBoard, @selector(applicationDidFinishLaunching:), (IMP)&_logos_method$Hooks$SpringBoard$applicationDidFinishLaunching$, (IMP*)&_logos_orig$Hooks$SpringBoard$applicationDidFinishLaunching$);}Class _logos_class$Hooks$SBCCDoNotDisturbSetting = objc_getClass("SBCCDoNotDisturbSetting"); { MSHookMessageEx(_logos_class$Hooks$SBCCDoNotDisturbSetting, @selector(_setDNDEnabled:updateServer:source:), (IMP)&_logos_method$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$, (IMP*)&_logos_orig$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$);}}
 
-	//	Wait a few seconds to start watching for new notifications in case of old notifications from before respring
+	
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, startupDelay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-		%init(DelayedHooks);
+		{Class _logos_class$DelayedHooks$NCNotificationMasterList = objc_getClass("NCNotificationMasterList"); { MSHookMessageEx(_logos_class$DelayedHooks$NCNotificationMasterList, @selector(insertNotificationRequest:), (IMP)&_logos_method$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$, (IMP*)&_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$);}}
 	});
 }

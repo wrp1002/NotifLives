@@ -58,11 +58,40 @@
 	}];
 }
 
--(void)Reset {
+-(void)ResetSettings {
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"];
+
+	NSInteger lives = [prefs integerForKey:@"kLives"];
+	NSInteger count = [prefs integerForKey:@"kCount"];
+
+	[prefs removeAllObjects];
+
+	[prefs setInteger:lives forKey:@"kLives"];
+	[prefs setInteger:count forKey:@"kCount"];
+
+	//NSFileManager *fm = [NSFileManager defaultManager];
+	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
+
+	[self Respring];
+}
+
+-(void)ResetLives {
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"];
+
+	[prefs setInteger:0 forKey:@"kLives"];
+	[prefs setInteger:0 forKey:@"kCount"];
+
+	//NSFileManager *fm = [NSFileManager defaultManager];
+	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
+
+	[self Respring];
+}
+
+-(void)ResetAll {
 	[[[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"] removeAllObjects];
 
-	NSFileManager *fm = [NSFileManager defaultManager];
-	[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
+	//NSFileManager *fm = [NSFileManager defaultManager];
+	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
 
 	[self Respring];
 }

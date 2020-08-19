@@ -103,9 +103,40 @@
 			<key>isSegmented</key>
 			<true/>
 			<key>segmentCount</key>
-			<integer>10</integer>
+			<integer>9</integer>
 			<key>default</key>
 			<integer>100</integer>
+			<key>defaults</key>
+			<string>com.wrp1002.notiflives</string>
+			<key>PostNotification</key>
+			<string>com.wrp1002.notiflives/ReloadPrefs</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Save Interval</string>
+			<key>footerText</key>
+			<string>Save notification count between resprings. Saves after every specified amount of notifications</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>key</key>
+			<string>kSaveInterval</string>
+			<key>min</key>
+			<integer>5</integer>
+			<key>max</key>
+			<integer>25</integer>
+			<key>showValue</key>
+			<true/>
+			<key>isSegmented</key>
+			<true/>
+			<key>segmentCount</key>
+			<integer>4</integer>
+			<key>default</key>
+			<integer>5</integer>
 			<key>defaults</key>
 			<string>com.wrp1002.notiflives</string>
 			<key>PostNotification</key>
@@ -151,7 +182,45 @@
 				<key>label</key>
 				<string>Reset all settings</string>
 				<key>action</key>
-				<string>Reset</string>
+				<string>ResetSettings</string>
+				<key>isDestructive</key>
+				<true/>
+				<key>confirmation</key>
+				<dict>
+					<key>prompt</key>
+					<string>Are you sure? This will respring your device.</string>
+					<key>title</key>
+					<string>Reset!</string>
+					<key>cancelTitle</key>
+					<string>Cancel</string>
+				</dict>
+		</dict>
+		<dict>
+			<key>cell</key>
+				<string>PSButtonCell</string>
+				<key>label</key>
+				<string>Reset Life Count</string>
+				<key>action</key>
+				<string>ResetLives</string>
+				<key>isDestructive</key>
+				<true/>
+				<key>confirmation</key>
+				<dict>
+					<key>prompt</key>
+					<string>Are you sure? This will respring your device.</string>
+					<key>title</key>
+					<string>Reset!</string>
+					<key>cancelTitle</key>
+					<string>Cancel</string>
+				</dict>
+		</dict>
+		<dict>
+			<key>cell</key>
+				<string>PSButtonCell</string>
+				<key>label</key>
+				<string>Reset Everything</string>
+				<key>action</key>
+				<string>ResetAll</string>
 				<key>isDestructive</key>
 				<true/>
 				<key>confirmation</key>
@@ -189,6 +258,8 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Developer</string>
+			<key>footerText</key>
+			<string>Any small donation is appreciated :)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -224,7 +295,7 @@
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>Donate :)</string>
+			<string>Support future development</string>
 			<key>action</key>
 			<string>OpenPaypal</string>
 			<key>icon</key>
