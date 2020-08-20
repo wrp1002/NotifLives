@@ -2,7 +2,7 @@ TARGET := iphone:clang:latest:7.0
 
 include $(THEOS)/makefiles/common.mk
 
-ARCHS = armv7 arm64 arm64e
+ARCHS = arm64 arm64e
 SDKVERSION = 13.3
 
 BUNDLE_NAME = NotifLivesPrefs
@@ -13,5 +13,6 @@ $(BUNDLE_NAME)_PRIVATE_FRAMEWORKS = Preferences
 $(BUNDLE_NAME)_INSTALL_PATH = /Library/PreferenceBundles
 $(BUNDLE_NAME)_CFLAGS = -fobjc-arc
 $(BUNDLE_NAME)_EXTRA_FRAMEWORKS = Cephei CepheiPrefs
+$(BUNDLE_NAME)_LIBRARIES = sparkapplist
 
 include $(THEOS_MAKE_PATH)/bundle.mk

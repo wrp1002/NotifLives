@@ -9,6 +9,8 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Options</string>
+			<key>footerText</key>
+			<string>If "Enable For All Apps" is enabled, selected apps will be ignored and any notification will add to the total count</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -38,6 +40,28 @@
 			<key>PostNotification</key>
 			<string>com.wrp1002.notiflives/ReloadPrefs</string>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Enable For All Apps</string>
+			<key>key</key>
+			<string>kAllEnabled</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.wrp1002.notiflives</string>
+			<key>PostNotification</key>
+			<string>com.wrp1002.notiflives/ReloadPrefs</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Select Apps...</string>
+			<key>action</key>
+			<string>SelectApps</string>
+		</dict>
 
 		<dict>
 			<key>cell</key>
@@ -45,7 +69,7 @@
 			<key>label</key>
 			<string>Custom Sound</string>
 			<key>footerText</key>
-			<string>Place custom sounds in /Library/NotifLives/Sounds/</string>
+			<string>Place custom sounds in /Library/NotifLives/Sounds/&#xA;Note: If you add a custom sound to this folder, it will have to be deleted manually if you uninstall the tweak</string>
 		</dict>
 		<dict>
 			<key>cell</key>

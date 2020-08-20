@@ -7,7 +7,12 @@
   /home/wes/theos/vendor/include/Preferences/PSViewController.h \
   /home/wes/theos/vendor/include/Preferences/PSSpecifier.h \
   /home/wes/theos/vendor/include/Preferences/PSTableCell.h \
-  /home/wes/theos/vendor/lib/Cephei.framework/Headers/HBPreferences.h
+  /home/wes/theos/vendor/lib/Cephei.framework/Headers/HBPreferences.h \
+  /home/wes/theos/include/AppList/AppList.h \
+  /home/wes/theos/include/AppList/ALApplicationList.h \
+  /home/wes/theos/include/AppList/ALApplicationTableDataSource.h \
+  /home/wes/theos/include/AppList/ALValueCell.h \
+  /home/wes/theos/include/SparkAppList/SparkAppListTableViewController.h
 
 /home/wes/theos/Prefix.pch:
 
@@ -28,3 +33,13 @@ NLVRootListController.h:
 /home/wes/theos/vendor/include/Preferences/PSTableCell.h:
 
 /home/wes/theos/vendor/lib/Cephei.framework/Headers/HBPreferences.h:
+
+/home/wes/theos/include/AppList/AppList.h:
+
+/home/wes/theos/include/AppList/ALApplicationList.h:
+
+/home/wes/theos/include/AppList/ALApplicationTableDataSource.h:
+
+/home/wes/theos/include/AppList/ALValueCell.h:
+
+/home/wes/theos/include/SparkAppList/SparkAppListTableViewController.h:

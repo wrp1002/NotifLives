@@ -18,6 +18,10 @@
 	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID hasSound:(BOOL)hasSound soundID:(int)soundID vibrateMode:(int)vibrate soundPath:(NSString *)soundPath attachmentImage:(UIImage *)attachmentImage overrideBundleImage:(UIImage *)overrideBundleImage;
 @end
 
+@interface NCNotificationRequest : NSObject
+	-(NSString *)sectionIdentifier;
+@end
+
 
 
 
@@ -164,10 +168,10 @@ void UpdateLives() {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class NCNotificationMasterList; @class SBCCDoNotDisturbSetting; @class SpringBoard; 
+@class SpringBoard; @class SBCCDoNotDisturbSetting; @class NCNotificationMasterList; 
 
 
-#line 145 "Tweak.x"
+#line 149 "Tweak.x"
 static void (*_logos_orig$Hooks$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$Hooks$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$)(_LOGOS_SELF_TYPE_NORMAL SBCCDoNotDisturbSetting* _LOGOS_SELF_CONST, SEL, BOOL, BOOL, unsigned long long); static void _logos_method$Hooks$SBCCDoNotDisturbSetting$_setDNDEnabled$updateServer$source$(_LOGOS_SELF_TYPE_NORMAL SBCCDoNotDisturbSetting* _LOGOS_SELF_CONST, SEL, BOOL, BOOL, unsigned long long); 
 
 	
@@ -203,6 +207,10 @@ static void (*_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificati
 		static void _logos_method$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$(_LOGOS_SELF_TYPE_NORMAL NCNotificationMasterList* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id arg1) {
 			_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificationRequest$(self, _cmd, arg1);
 			Log(@"- (void)insertNotificationRequest:(id)arg1;");
+
+			NCNotificationRequest *notif = arg1;
+			Log([NSString stringWithFormat:@"New notification from %@", [notif sectionIdentifier]]);
+
 			UpdateLives();
 		}
 	
@@ -212,7 +220,7 @@ static void (*_logos_orig$DelayedHooks$NCNotificationMasterList$insertNotificati
 
 
 
-static __attribute__((constructor)) void _logosLocalCtor_7fbd77b1(int __unused argc, char __unused **argv, char __unused **envp) {
+static __attribute__((constructor)) void _logosLocalCtor_863a598c(int __unused argc, char __unused **argv, char __unused **envp) {
 	preferences = [[HBPreferences alloc] initWithIdentifier:kIdentifier];
 
 	if ((NSString *)[preferences objectForKey:@"kSoundFile"] == nil)

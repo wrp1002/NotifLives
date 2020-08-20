@@ -144,4 +144,11 @@
 	}
 }
 
+-(void)SelectApps {
+    SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.wrp1002.notiflives" andKey:@"kApps"];
+
+    [self.navigationController pushViewController:s animated:YES];
+    self.navigationItem.hidesBackButton = FALSE;
+}
+
 @end

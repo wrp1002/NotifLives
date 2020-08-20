@@ -1,6 +1,7 @@
 #import <Cephei/HBPreferences.h>
 #import <AudioToolbox/AudioServices.h>
 #import <objc/runtime.h>
+#import <SparkAppList/SparkAppList.h>
 
 
 #define kIdentifier @"com.wrp1002.notiflives"
@@ -17,10 +18,15 @@
 	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID hasSound:(BOOL)hasSound soundID:(int)soundID vibrateMode:(int)vibrate soundPath:(NSString *)soundPath attachmentImage:(UIImage *)attachmentImage overrideBundleImage:(UIImage *)overrideBundleImage;
 @end
 
+@interface NCNotificationRequest : NSObject
+	-(NSString *)sectionIdentifier;
+@end
+
 
 //	=========================== Preference vars ===========================
 
 BOOL enabled;
+BOOL allEnabled;
 BOOL showNotifications;
 NSInteger maxCount;
 NSInteger saveInterval;
@@ -175,9 +181,18 @@ void UpdateLives() {
 
 	%hook NCNotificationMasterList
 		- (void)insertNotificationRequest:(id)arg1 {
-			%orig;
 			Log(@"- (void)insertNotificationRequest:(id)arg1;");
-			UpdateLives();
+			%orig;
+			if (!enabled) return;
+
+			NCNotificationRequest *notif = arg1;
+			NSString *bundleID = [notif sectionIdentifier];
+
+			if (allEnabled || [SparkAppList doesIdentifier:kIdentifier andKey:@"kApps" containBundleIdentifier:bundleID]) {
+				Log([NSString stringWithFormat:@"New notification from: %@", bundleID]);
+				UpdateLives();
+			}
+
 		}
 	%end
 
@@ -193,6 +208,7 @@ void UpdateLives() {
 		[preferences setObject:@"Powerup.wav" forKey:@"kSoundFile"];
 
     [preferences registerBool:&enabled default:YES forKey:@"kEnabled"];
+	[preferences registerBool:&allEnabled default:YES forKey:@"kAllEnabled"];
 	[preferences registerBool:&showNotifications default:YES forKey:@"kNotifications"];
 
 	[preferences registerFloat:&delayTime default:1.0f forKey:@"kDelay"];

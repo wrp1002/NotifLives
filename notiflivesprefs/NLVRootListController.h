@@ -1,9 +1,11 @@
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
 #import <Cephei/HBPreferences.h>
-#import <spawn.h>
 #import <AudioToolbox/AudioServices.h>
+#import <spawn.h>
 #import <objc/runtime.h>
+#import <AppList/AppList.h>
+#import <SparkAppList/SparkAppListTableViewController.h>
 
 @interface JBBulletinManager : NSObject
 	+(id)sharedInstance;
