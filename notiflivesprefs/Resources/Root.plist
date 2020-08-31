@@ -9,8 +9,6 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Options</string>
-			<key>footerText</key>
-			<string>If "Enable For All Apps" is enabled, selected apps will be ignored and any notification will add to the total count</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -44,8 +42,10 @@
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>label</key>
-			<string>Enable For All Apps</string>
+			<string>Enable For All App Notifications</string>
 			<key>key</key>
+			<string>kAllEnabled</string>
+			<key>id</key>
 			<string>kAllEnabled</string>
 			<key>default</key>
 			<true/>
@@ -61,6 +61,8 @@
 			<string>Select Apps...</string>
 			<key>action</key>
 			<string>SelectApps</string>
+			<key>id</key>
+			<string>kSelectButton</string>
 		</dict>
 
 		<dict>

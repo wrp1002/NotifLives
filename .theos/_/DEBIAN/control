@@ -7,4 +7,4 @@ Author: Wes <wes.hamster@gmail.com>
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000), preferenceloader, ws.hbang.common (>= 1.2), net.limneos.libbulletin, com.spark.libsparkapplist
 Version: 1.1.1
-Installed-Size: 460
+Installed-Size: 464
