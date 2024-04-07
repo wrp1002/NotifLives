@@ -88,6 +88,20 @@ jobs:
       - name: Install dependencies
         run: brew install make xz ldid
 
+      - name: Set THEOS environment variable
+        run: echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
+
+      - name: Checkout AltList
+        uses: actions/checkout@main
+        with:
+          repository: opa334/AltList
+          ref: main
+          path: altlist
+
+      - name: Install AltList
+        working-directory: altlist
+        run: make FINALPACKAGE=1 && cp -Rv "./.theos/obj/AltList.framework" "$THEOS/lib"
+
       - name: Build package (rootful)
         run: THEOS=theos gmake clean package FINALPACKAGE=1
 
