@@ -21,7 +21,7 @@ SDKVERSION = 16.5
 
 TWEAK_NAME = NotifLives
 
-$(TWEAK_NAME)_FILES = Tweak.x Debug.x
+$(TWEAK_NAME)_FILES = Tweak.x
 $(TWEAK_NAME)_CFLAGS = -fobjc-arc
 $(TWEAK_NAME)_EXTRA_FRAMEWORKS += Cephei AltList
 
