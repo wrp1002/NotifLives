@@ -1,6 +1,6 @@
 #include "NLVRootListController.h"
 
-@implementation NLVRootListController 
+@implementation NLVRootListController
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
@@ -10,7 +10,7 @@
 	//In this array you should add the IDs of all the specifiers you are going to hide & show.
 	//Do not include the IDs of the cells you will reinsert them under.
 	//Notice I only included "cellID" and not "switchID".
-	NSArray *chosenIDs = @[@"kSelectButton"];
+	NSArray *chosenIDs = @[@"kApps"];
 	self.savedSpecifiers = (self.savedSpecifiers) ?: [[NSMutableDictionary alloc] init];
 	for(PSSpecifier *specifier in _specifiers) {
 		if([chosenIDs containsObject:[specifier propertyForKey:@"id"]]) {
@@ -30,9 +30,9 @@
 	NSString *key = [specifier propertyForKey:@"key"];
 	if([key isEqualToString:@"kAllEnabled"]) {
 		if([value boolValue])
-			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
-		else if(![self containsSpecifier:self.savedSpecifiers[@"kSelectButton"]])
-			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] afterSpecifierID:@"kAllEnabled" animated:YES];
+			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
+		else if(![self containsSpecifier:self.savedSpecifiers[@"kApps"]])
+			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] afterSpecifierID:@"kAllEnabled" animated:YES];
 	}
 }
 
@@ -43,8 +43,8 @@
   //I check if our switchKey is NO, then hide the specifier
   //Customize this to however you get your preferences, whether is directly from a plist or Cephei.
   HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.wrp1002.notiflives"];
-  if([preferences boolForKey:@"kAllEnabled"]) {
-    [self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
+  if([preferences boolForKey:@"kAllEnabled" default:true]) {
+    [self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
   }
 }
 
@@ -56,11 +56,7 @@
 
 
 -(void)Respring {
-    pid_t pid;
-	int status;
-	const char* args[] = {"killall", "-9", "SpringBoard", NULL};
-	posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
-	waitpid(pid, &status, WEXITED);//wait untill the process completes (only if you need to do that)
+    [HBRespringController respring];
 }
 
 -(void)OpenGithub {
@@ -114,10 +110,8 @@
 	[prefs setInteger:lives forKey:@"kLives"];
 	[prefs setInteger:count forKey:@"kCount"];
 
-	//NSFileManager *fm = [NSFileManager defaultManager];
-	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
-
-	[self Respring];
+	[self reloadSpecifiers];
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(BUNDLE_NOTIFY), nil, nil, true);
 }
 
 -(void)ResetLives {
@@ -133,12 +127,37 @@
 }
 
 -(void)ResetAll {
-	[[[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"] removeAllObjects];
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:BUNDLE];
+	[prefs removeAllObjects];
+	[self reloadSpecifiers];
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(BUNDLE_NOTIFY), nil, nil, true);
+}
 
-	//NSFileManager *fm = [NSFileManager defaultManager];
-	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
-
-	[self Respring];
+-(UIWindow*) GetKeyWindow {
+	if (@available(iOS 13, *)) {
+		NSSet *connectedScenes = [UIApplication sharedApplication].connectedScenes;
+		for (UIScene *scene in connectedScenes) {
+			if ([scene isKindOfClass:[UIWindowScene class]]) {
+				UIWindowScene *windowScene = (UIWindowScene *)scene;
+				for (UIWindow *window in windowScene.windows) {
+					if (window.isKeyWindow) {
+						return window;
+					}
+				}
+			}
+		}
+	} else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+		NSArray		 *windows = [[UIApplication sharedApplication] windows];
+#pragma clang diagnostic pop
+		for (UIWindow   *window in windows) {
+			if (window.isKeyWindow) {
+				return window;
+			}
+		}
+	}
+	return nil;
 }
 
 -(void)PlaySound {
@@ -147,30 +166,25 @@
 	[self.view endEditing:YES];
 
 	HBPreferences *preferences;
-	preferences = [[HBPreferences alloc] initWithIdentifier:@"com.wrp1002.notiflives"];
+	preferences = [[HBPreferences alloc] initWithIdentifier:BUNDLE];
 
+	NSString *dir = ROOT_PATH_NS(@"/Library/NotifLives/Sounds/");
 	NSString *fileName = (NSString *)[preferences objectForKey:@"kSoundFile"];
+	fileName = [NSString stringWithFormat:@"%@%@", dir, fileName];
 
 	SystemSoundID sound;
-	OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", fileName]], &sound);
+	OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:fileName], &sound);
 	if (error == kAudioServicesNoError) {
 		AudioServicesPlaySystemSoundWithCompletion(sound, ^{
 			AudioServicesDisposeSystemSoundID(sound);
 		});
 	}
 	else {
-		UIWindow        *keyWindow = nil;
-		NSArray         *windows = [[UIApplication sharedApplication]windows];
-		for (UIWindow   *window in windows) {
-			if (window.isKeyWindow) {
-				keyWindow = window;
-				break;
-			}
-		}
+		NSLog(@"NotifLives: Error");
 
 		UIAlertController * alert = [UIAlertController
                                  alertControllerWithTitle:@"Error with sound file"
-                                 message:@"There was an error playing your sound file. Check the file name and make sure it's in /Library/NotifLives/Sounds/"
+                                 message: @"There was an error playing your sound file. Check the file name and make sure it's in /Library/NotifLives/Sounds/ or /var/jb/Library/NotifLives/Sounds/ on rootless"
                                  preferredStyle:UIAlertControllerStyleAlert];
 
 		//Add Buttons
@@ -179,21 +193,14 @@
 									style:UIAlertActionStyleDefault
 									handler:^(UIAlertAction * action) {
 										//Handle dismiss button action here
-										
+
 									}];
 
 		//Add your buttons to alert controller
 		[alert addAction:dismissButton];
 
-		[keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+		[[self GetKeyWindow].rootViewController presentViewController:alert animated:YES completion:nil];
 	}
-}
-
--(void)SelectApps {
-    SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.wrp1002.notiflives" andKey:@"kApps"];
-
-    [self.navigationController pushViewController:s animated:YES];
-    self.navigationItem.hidesBackButton = FALSE;
 }
 
 @end

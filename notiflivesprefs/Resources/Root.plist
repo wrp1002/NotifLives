@@ -56,13 +56,32 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSButtonCell</string>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>ATLApplicationListMultiSelectionController</string>
+			<key>defaults</key>
+			<string>com.wrp1002.notiflives</string>
+			<key>key</key>
+			<string>kApps</string>
 			<key>label</key>
-			<string>Select Apps...</string>
-			<key>action</key>
-			<string>SelectApps</string>
+			<string>Select Apps</string>
 			<key>id</key>
-			<string>kSelectButton</string>
+			<string>kApps</string>
+			<key>sections</key>
+			<array>
+				<dict>
+					<key>sectionType</key>
+					<string>Visible</string>
+				</dict>
+			</array>
+			<key>showIdentifiersAsSubtitle</key>
+			<true/>
+			<key>defaultApplicationSwitchValue</key>
+			<false/>
+			<key>useSearchBar</key>
+			<true/>
+			<key>PostNotification</key>
+			<string>com.wrp1002.notiflives/ReloadPrefs</string>
 		</dict>
 
 		<dict>
@@ -71,31 +90,45 @@
 			<key>label</key>
 			<string>Custom Sound</string>
 			<key>footerText</key>
-			<string>Place custom sounds in /Library/NotifLives/Sounds/&#xA;Note: If you add a custom sound to this folder, it will have to be deleted manually if you uninstall the tweak</string>
+			<string>To use a custom sound effect, replace /Library/NotifLives/Sounds/custom (/var/jb/... on rootless) with your sound effect file. Then you can select "Custom" as your sound effect</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.wrp1002.notiflives/ReloadPrefs</string>
 			<key>cell</key>
-			<string>PSEditTextCell</string>
+			<string>PSLinkListCell</string>
 			<key>label</key>
-			<string>Sound File:</string>
+			<string>Sound Effect</string>
 			<key>key</key>
 			<string>kSoundFile</string>
-			<key>noAutoCorrect</key>
-			<true/>
-
-			<key>prompt</key>
-			<string>prompt</string>
-			<key>okTitle</key>
-			<string>ok</string>
-			<key>cancelTitle</key>
-			<string>cancel</string>
-
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validTitles</key>
+			<array>
+				<string>Mario 1UP</string>
+				<string>Kirby</string>
+				<string>Sonic extra life</string>
+				<string>Minecraft level up</string>
+				<string>Pokemon level up</string>
+				<string>Final Fantasy level up</string>
+				<string>Powerup</string>
+				<string>Custom</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<string>smb_1-up.wav</string>
+				<string>kirby_extra_life.mp3</string>
+				<string>sonic-extra-life.mp3</string>
+				<string>mc-levelup.mp3</string>
+				<string>pokemon-levelup.mp3</string>
+				<string>ff_levelup.mp3</string>
+				<string>Powerup.wav</string>
+				<string>custom</string>
+			</array>
 			<key>default</key>
 			<string>Powerup.wav</string>
 			<key>defaults</key>
 			<string>com.wrp1002.notiflives</string>
-			<key>PostNotification</key>
-			<string>com.wrp1002.notiflives/ReloadPrefs</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -105,7 +138,7 @@
 				<key>action</key>
 				<string>PlaySound</string>
 		</dict>
-		
+
 
 		<dict>
 			<key>cell</key>
