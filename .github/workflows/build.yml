@@ -48,6 +48,14 @@ jobs:
           sparse-checkout: iPhoneOS14.5.sdk
           path: theos/sdks
 
+      - name: Checkout SDKs (13.0)
+        uses: actions/checkout@main
+        with:
+          repository: xybp888/iOS-SDKs
+          ref: master
+          sparse-checkout: iPhoneOS13.0.sdk
+          path: theos/sdks
+
       - name: Install dependencies
         run: HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install make xz ldid
 
