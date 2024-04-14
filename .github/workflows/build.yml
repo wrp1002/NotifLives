@@ -39,7 +39,7 @@ jobs:
         run: echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
 
       - name: echo theos
-        run: echo $THEOS
+        run: ls $THEOS
 
       - name: Checkout libSparkAppList
         uses: actions/checkout@main
@@ -47,6 +47,10 @@ jobs:
           repository: SparkDev97/libSparkAppList
           ref: master
           path: libSparkAppList
+
+      - name: echo libSparkAppList
+        working-directory: libSparkAppList
+        run: ls
 
       - name: Install libSparkAppList
         working-directory: libSparkAppList
