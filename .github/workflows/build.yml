@@ -77,14 +77,6 @@ jobs:
           submodules: recursive
           path: theos
 
-      - name: Checkout SDKs
-        uses: actions/checkout@main
-        with:
-          repository: xybp888/iOS-SDKs
-          ref: master
-          sparse-checkout: iPhoneOS14.2.sdk
-          path: theos/sdks
-
       - name: Install dependencies
         run: brew install make xz ldid
 
@@ -98,9 +90,25 @@ jobs:
           ref: main
           path: altlist
 
+      - name: Checkout SDKs
+        uses: actions/checkout@main
+        with:
+          repository: theos/sdks
+          ref: master
+          sparse-checkout: iPhoneOS16.5.sdk
+          path: theos/sdks
+
       - name: Install AltList
         working-directory: altlist
         run: make clean && make FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless && mkdir -p "$THEOS/lib/iphone/rootless/lib" && cp -Rv "./.theos/obj/AltList.framework" "$THEOS/lib/iphone/rootless"
+
+      - name: Checkout SDKs
+        uses: actions/checkout@main
+        with:
+          repository: xybp888/iOS-SDKs
+          ref: master
+          sparse-checkout: iPhoneOS14.2.sdk
+          path: theos/sdks
 
       - name: Build package (rootful)
         run: THEOS=theos gmake clean package FINALPACKAGE=1
