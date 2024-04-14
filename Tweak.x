@@ -2,7 +2,7 @@
 #import <Cephei/HBPreferences.h>
 #import <AudioToolbox/AudioServices.h>
 #import <objc/runtime.h>
-#import <SparkAppList/SparkAppList.h>
+#import <SparkAppList.h>
 #import <rootless.h>
 
 

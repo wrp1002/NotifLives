@@ -3,7 +3,7 @@
 #import <Cephei/HBPreferences.h>
 #import <Cephei/HBRespringController.h>
 #import <AudioToolbox/AudioServices.h>
-#import <SparkAppList/SparkAppListTableViewController.h>
+#import <SparkAppListTableViewController.h>
 #import <rootless.h>
 
 #define TWEAK_NAME @"NotifLives"
