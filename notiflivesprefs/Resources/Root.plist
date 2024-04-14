@@ -56,32 +56,15 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>detail</key>
-			<string>ATLApplicationListMultiSelectionController</string>
-			<key>defaults</key>
-			<string>com.wrp1002.notiflives</string>
+			<string>PSButtonCell</string>
 			<key>key</key>
-			<string>kApps</string>
-			<key>label</key>
-			<string>Select Apps</string>
+			<string>kSelectButton</string>
 			<key>id</key>
-			<string>kApps</string>
-			<key>sections</key>
-			<array>
-				<dict>
-					<key>sectionType</key>
-					<string>Visible</string>
-				</dict>
-			</array>
-			<key>showIdentifiersAsSubtitle</key>
-			<true/>
-			<key>defaultApplicationSwitchValue</key>
-			<false/>
-			<key>useSearchBar</key>
-			<true/>
-			<key>PostNotification</key>
-			<string>com.wrp1002.notiflives/ReloadPrefs</string>
+			<string>kSelectButton</string>
+			<key>label</key>
+			<string>Select Apps...</string>
+			<key>action</key>
+			<string>SelectApps</string>
 		</dict>
 
 		<dict>

@@ -10,7 +10,7 @@
 	//In this array you should add the IDs of all the specifiers you are going to hide & show.
 	//Do not include the IDs of the cells you will reinsert them under.
 	//Notice I only included "cellID" and not "switchID".
-	NSArray *chosenIDs = @[@"kApps"];
+	NSArray *chosenIDs = @[@"kSelectButton"];
 	self.savedSpecifiers = (self.savedSpecifiers) ?: [[NSMutableDictionary alloc] init];
 	for(PSSpecifier *specifier in _specifiers) {
 		if([chosenIDs containsObject:[specifier propertyForKey:@"id"]]) {
@@ -30,9 +30,9 @@
 	NSString *key = [specifier propertyForKey:@"key"];
 	if([key isEqualToString:@"kAllEnabled"]) {
 		if([value boolValue])
-			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
-		else if(![self containsSpecifier:self.savedSpecifiers[@"kApps"]])
-			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] afterSpecifierID:@"kAllEnabled" animated:YES];
+			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
+		else if(![self containsSpecifier:self.savedSpecifiers[@"kSelectButton"]])
+			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] afterSpecifierID:@"kAllEnabled" animated:YES];
 	}
 }
 
@@ -44,7 +44,7 @@
   //Customize this to however you get your preferences, whether is directly from a plist or Cephei.
   HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.wrp1002.notiflives"];
   if([preferences boolForKey:@"kAllEnabled" default:true]) {
-    [self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
+    [self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
   }
 }
 
@@ -201,6 +201,13 @@
 
 		[[self GetKeyWindow].rootViewController presentViewController:alert animated:YES completion:nil];
 	}
+}
+
+-(void)SelectApps {
+    SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.wrp1002.notiflives" andKey:@"kApps"];
+
+    [self.navigationController pushViewController:s animated:YES];
+    self.navigationItem.hidesBackButton = FALSE;
 }
 
 @end

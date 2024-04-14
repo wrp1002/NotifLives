@@ -2,11 +2,12 @@
 #import <Cephei/HBPreferences.h>
 #import <AudioToolbox/AudioServices.h>
 #import <objc/runtime.h>
+#import <SparkAppList/SparkAppList.h>
 #import <rootless.h>
 
 
 #define TWEAK_NAME @"NotifLives"
-#define BUNDLE [NSString stringWithFormat:@"com.wrp1002.%@", [TWEAK_NAME lowercaseString]]
+#define BUNDLE @"com.wrp1002.notiflives"
 
 @interface JBBulletinManager : NSObject
 	+(id)sharedInstance;
@@ -66,12 +67,16 @@ void UpdateLives() {
 
 		if (showNotifications) {
 			NSString *soundPath = [NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName];
-			[[objc_getClass("JBBulletinManager") sharedInstance] showBulletinWithTitle:@"1UP!" message:[NSString stringWithFormat:@"Lives: %li", (long)lives] overrideBundleImage:(UIImage *)[UIImage imageNamed:ROOT_PATH_NS(@"/Library/NotifLives/Images/icon.png")] soundPath:ROOT_PATH_NS(soundPath)];
+			[[objc_getClass("JBBulletinManager") sharedInstance]
+				showBulletinWithTitle:@"1UP!"
+				message:[NSString stringWithFormat:@"Lives: %li", (long)lives]
+				overrideBundleImage:(UIImage *)[UIImage imageNamed:@"/Library/NotifLives/Images/icon.png"]
+				soundPath:soundPath];
 		}
 		else {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
 				NSString *fileName = [NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName];
-				fileName = ROOT_PATH_NS(fileName);
+				ROOT_PATH_NS(@"/Library/NotifLives/Images/icon.png");
 
 				SystemSoundID sound;
 				OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:fileName], &sound);
@@ -110,7 +115,7 @@ void UpdateLives() {
 			NCNotificationRequest *notif = arg1;
 			NSString *bundleID = [notif sectionIdentifier];
 
-			if (allEnabled || [selectedApps containsObject:bundleID]) {
+			if (allEnabled || [SparkAppList doesIdentifier:BUNDLE andKey:@"kApps" containBundleIdentifier:bundleID]) {
 				//[Debug Log:[NSString stringWithFormat:@"New notification from: %@", bundleID]];
 				UpdateLives();
 			}
@@ -144,7 +149,6 @@ void UpdateLives() {
 	count = [preferences integerForKey:@"kCount" default:0];
 
 	[preferences registerObject:&soundFileName default:@"Powerup.wav" forKey:@"kSoundFile"];
-	[preferences registerObject:&selectedApps default:@[] forKey:@"kApps"];
 
 	//	Wait a few seconds to start watching for new notifications in case of old notifications from before respring
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, startupDelay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
