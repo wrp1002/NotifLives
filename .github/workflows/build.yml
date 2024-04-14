@@ -38,6 +38,9 @@ jobs:
       - name: Set THEOS environment variable
         run: echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
 
+      - name: echo theos
+        run: echo $THEOS
+
       - name: Checkout libSparkAppList
         uses: actions/checkout@main
         with:
