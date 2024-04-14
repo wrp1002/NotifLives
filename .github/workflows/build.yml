@@ -48,15 +48,21 @@ jobs:
           ref: master
           path: libSparkAppList
 
+      - name: echo worksapce
+        run: ls $GITHUB_WORKSPACE
+
+      - name: echo libSparkAppList1
+        run: ls $GITHUB_WORKSPACE/libSparkAppList
+
       - name: echo libSparkAppList
         working-directory: libSparkAppList
         run: ls
-
+      
       - name: Install libSparkAppList
         working-directory: libSparkAppList
         run: |
-          cp "./lib/*" "$THEOS/lib"
-          cp "./headers/*" "$THEOS/include"
+          cp -r ./lib/. "$THEOS/lib"
+          cp -r ./headers/. "$THEOS/include"
 
       - name: Build package (rootless)
         run: THEOS=theos gmake clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
