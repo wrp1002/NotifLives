@@ -46,7 +46,7 @@ jobs:
           sparse-checkout: iPhoneOS15.5.sdk
 
       - name: Install libSparkAppList
-        run: cp lib/* $THEOS/lib && cp headers/* $THEOS/include
+        run: cp ./lib/* $THEOS/lib && cp ./headers/* $THEOS/include
 
       - name: Build package (rootless)
         run: THEOS=theos gmake clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
@@ -96,7 +96,7 @@ jobs:
           sparse-checkout: iPhoneOS15.5.sdk
 
       - name: Install libSparkAppList
-        run: cp lib/* $THEOS/lib && cp headers/* $THEOS/include
+        run: cp ./lib/* $THEOS/lib && cp ./headers/* $THEOS/include
 
       - name: Build package (rootful)
         run: THEOS=theos gmake clean package FINALPACKAGE=1
