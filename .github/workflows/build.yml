@@ -77,19 +77,16 @@ jobs:
           submodules: recursive
           path: theos
 
-      
+      - name: Install dependencies
+        run: brew install make xz ldid
+
       - name: Checkout SDKs
         uses: actions/checkout@main
         with:
-          repository: xybp888/iOS-SDKs
+          repository: theos/sdks
           ref: master
-          sparse-checkout: |
-            iPhoneOS14.2.sdk
-            iPhoneOS14.5.sdk
+          sparse-checkout: iPhoneOS14.5.sdk
           path: theos/sdks
-
-      - name: Install dependencies
-        run: brew install make xz ldid
 
       - name: Set THEOS environment variable
         run: echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
@@ -104,6 +101,14 @@ jobs:
       - name: Install AltList
         working-directory: altlist
         run: make clean && make FINALPACKAGE=1 && cp -Rv "./.theos/obj/AltList.framework" "$THEOS/lib"
+
+      - name: Checkout SDKs
+        uses: actions/checkout@main
+        with:
+          repository: xybp888/iOS-SDKs
+          ref: master
+          sparse-checkout: iPhoneOS14.2.sdk
+          path: theos/sdks
 
       - name: Build package (rootful)
         run: THEOS=theos gmake clean package FINALPACKAGE=1
