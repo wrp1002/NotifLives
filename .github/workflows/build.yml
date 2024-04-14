@@ -45,7 +45,11 @@ jobs:
           ref: master
 
       - name: Install libSparkAppList
-        run: cp ./lib/* $THEOS/lib && cp ./headers/* $THEOS/include
+        run: |
+          mkdir $THEOS/lib
+          cp ./lib/* $THEOS/lib
+          mkdir $THEOS/include
+          cp ./headers/* $THEOS/include
 
       - name: Build package (rootless)
         run: THEOS=theos gmake clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
@@ -94,7 +98,11 @@ jobs:
           ref: master
 
       - name: Install libSparkAppList
-        run: cp ./lib/* $THEOS/lib && cp ./headers/* $THEOS/include
+        run: |
+          mkdir $THEOS/lib
+          cp ./lib/* $THEOS/lib
+          mkdir $THEOS/include
+          cp ./headers/* $THEOS/include
 
       - name: Build package (rootful)
         run: THEOS=theos gmake clean package FINALPACKAGE=1
