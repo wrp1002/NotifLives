@@ -1,5 +1,6 @@
 #include "NLVRootListController.h"
 
+
 @implementation NLVRootListController
 
 - (NSArray *)specifiers {
@@ -54,7 +55,6 @@
 }
 
 
-
 -(void)Respring {
     [HBRespringController respring];
 }
@@ -64,7 +64,7 @@
 	NSURL *URL = [NSURL URLWithString:@"https://github.com/wrp1002/NotifLives"];
 	[application openURL:URL options:@{} completionHandler:^(BOOL success) {
 		if (success) {
-			NSLog(@"Opened url");
+			//NSLog(@"Opened url");
 		}
 	}];
 }
@@ -74,7 +74,7 @@
 	NSURL *URL = [NSURL URLWithString:@"https://paypal.me/wrp1002"];
 	[application openURL:URL options:@{} completionHandler:^(BOOL success) {
 		if (success) {
-			NSLog(@"Opened url");
+			//NSLog(@"Opened url");
 		}
 	}];
 }
@@ -84,7 +84,7 @@
 	NSURL *URL = [NSURL URLWithString:@"https://reddit.com/u/wes_hamster"];
 	[application openURL:URL options:@{} completionHandler:^(BOOL success) {
 		if (success) {
-			NSLog(@"Opened url");
+			//NSLog(@"Opened url");
 		}
 	}];
 }
@@ -94,7 +94,7 @@
 	NSURL *URL = [NSURL URLWithString:@"mailto:wes.hamster@gmail.com?subject=NotifLives"];
 	[application openURL:URL options:@{} completionHandler:^(BOOL success) {
 		if (success) {
-			NSLog(@"Opened url");
+			//NSLog(@"Opened url");
 		}
 	}];
 }
@@ -161,7 +161,7 @@
 }
 
 -(void)PlaySound {
-	NSLog(@"NotifLives: PlaySound");
+	//NSLog(@"NotifLives: PlaySound");
 
 	[self.view endEditing:YES];
 
@@ -180,7 +180,7 @@
 		});
 	}
 	else {
-		NSLog(@"NotifLives: Error");
+		//NSLog(@"NotifLives: Error");
 
 		UIAlertController * alert = [UIAlertController
                                  alertControllerWithTitle:@"Error with sound file"

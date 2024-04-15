@@ -4,25 +4,12 @@
 #import <objc/runtime.h>
 #import <SparkAppList.h>
 #import <rootless.h>
+#import "Tweak.h"
+#import "Globals.h"
 
 
 #define TWEAK_NAME @"NotifLives"
 #define BUNDLE @"com.wrp1002.notiflives"
-
-@interface JBBulletinManager : NSObject
-	+(id)sharedInstance;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID soundPath:(NSString *)soundPath;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID soundID:(int)inSoundID;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg overrideBundleImage:(UIImage *)bundleImage;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg overrideBundleImage:(UIImage *)bundleImage soundPath:(NSString *)inSoundPath;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg inOverridBundleImage:(UIImage *)bundleImage soundID:(int)soundID;
-	-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)msg bundleID:(NSString *)bundleID hasSound:(BOOL)hasSound soundID:(int)soundID vibrateMode:(int)vibrate soundPath:(NSString *)soundPath attachmentImage:(UIImage *)attachmentImage overrideBundleImage:(UIImage *)overrideBundleImage;
-@end
-
-@interface NCNotificationRequest : NSObject
-	-(NSString *)sectionIdentifier;
-@end
 
 
 //	=========================== Preference vars ===========================
@@ -67,19 +54,22 @@ void UpdateLives() {
 
 		if (showNotifications) {
 			NSString *soundPath = [NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName];
+			soundPath = ROOT_PATH_NS(soundPath);
+			NSString *imagePath = ROOT_PATH_NS(@"/Library/NotifLives/Images/icon.png");
+
 			[[objc_getClass("JBBulletinManager") sharedInstance]
 				showBulletinWithTitle:@"1UP!"
 				message:[NSString stringWithFormat:@"Lives: %li", (long)lives]
-				overrideBundleImage:(UIImage *)[UIImage imageNamed:@"/Library/NotifLives/Images/icon.png"]
+				overrideBundleImage:(UIImage *)[UIImage imageNamed:imagePath]
 				soundPath:soundPath];
 		}
 		else {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
-				NSString *fileName = [NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName];
-				ROOT_PATH_NS(@"/Library/NotifLives/Images/icon.png");
+				NSString *soundPath = [NSString stringWithFormat:@"/Library/NotifLives/Sounds/%@", soundFileName];
+				soundPath = ROOT_PATH_NS(soundPath);
 
 				SystemSoundID sound;
-				OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:fileName], &sound);
+				OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:soundPath], &sound);
 				if (error == kAudioServicesNoError) {
 					AudioServicesPlaySystemSoundWithCompletion(sound, ^{
 						AudioServicesDisposeSystemSoundID(sound);
@@ -101,10 +91,26 @@ void UpdateLives() {
 
 //	=========================== Hooks ===========================
 
+%group iOS12AndBelowHooks
+	%hook NCNotificationAlertQueue
+		-(void)postNotificationRequest:(id)arg1 forCoalescedNotification:(id)arg2 {
+			%orig;
 
-//	Delay this hook so that notifications from before respringing do not trigger new lives
-%group DelayedHooks
+			if (!enabled) return;
 
+			NCNotificationRequest *notif = arg1;
+			NSString *bundleID = [notif sectionIdentifier];
+
+			if (allEnabled || [SparkAppList doesIdentifier:BUNDLE andKey:@"kApps" containBundleIdentifier:bundleID]) {
+				//[Debug Log:[NSString stringWithFormat:@"New notification from: %@", bundleID]];
+				UpdateLives();
+			}
+
+		}
+	%end
+%end
+
+%group iOS13AndUpHooks
 	%hook NCNotificationMasterList
 		- (void)insertNotificationRequest:(id)arg1 {
 			%orig;
@@ -122,7 +128,6 @@ void UpdateLives() {
 
 		}
 	%end
-
 %end
 
 
@@ -152,6 +157,11 @@ void UpdateLives() {
 
 	//	Wait a few seconds to start watching for new notifications in case of old notifications from before respring
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, startupDelay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-		%init(DelayedHooks);
+		if (@available(iOS 13.0, *)) {
+			%init(iOS13AndUpHooks);
+		}
+		else {
+			%init(iOS12AndBelowHooks);
+		}
 	});
 }

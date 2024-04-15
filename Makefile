@@ -12,13 +12,14 @@ ifeq ($(THEOS_PACKAGE_SCHEME),rootless)
 	ARCHS = arm64 arm64e
 	TARGET = iphone:clang:15.5:15.0
 else
-	ARCHS = armv7 armv7s arm64 arm64e
+	ARCHS = arm64 arm64e
 	TARGET = iphone:clang:14.2:8.0
 endif
 
+export ARCHS TARGET INSTALL_TARGET_PROCESSES
+include $(THEOS)/makefiles/common.mk
 
 SDKVERSION = 16.5
-
 TWEAK_NAME = NotifLives
 
 $(TWEAK_NAME)_FILES = Tweak.x
@@ -26,7 +27,6 @@ $(TWEAK_NAME)_CFLAGS = -fobjc-arc
 $(TWEAK_NAME)_EXTRA_FRAMEWORKS += Cephei
 $(TWEAK_NAME)_LIBRARIES = sparkapplist
 
-include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += notiflivesprefs
 include $(THEOS_MAKE_PATH)/aggregate.mk
