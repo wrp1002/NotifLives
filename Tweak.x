@@ -1,8 +1,6 @@
 #import <UIKit/UIKit.h>
-#import <Cephei/HBPreferences.h>
 #import <AudioToolbox/AudioServices.h>
 #import <objc/runtime.h>
-#import <SparkAppList.h>
 #import <rootless.h>
 #import "Tweak.h"
 #import "Globals.h"
@@ -10,6 +8,7 @@
 
 #define TWEAK_NAME @"NotifLives"
 #define BUNDLE @"com.wrp1002.notiflives"
+#define PREFS_RELOAD "com.wrp1002.notiflives/ReloadPrefs"
 
 
 //	=========================== Preference vars ===========================
@@ -21,25 +20,48 @@ NSInteger maxCount;
 NSInteger saveInterval;
 CGFloat delayTime;
 NSString *soundFileName;
-NSInteger count = 0;
-NSInteger lives = 0;
+NSInteger count;
+NSInteger lives;
 NSArray *selectedApps;
+
+NSUserDefaults *prefs = nil;
+
+static void InitPrefs(void) {
+	if (!prefs) {
+		NSDictionary *defaultPrefs = @{
+			@"kEnabled": @YES,
+			@"kAllEnabled": @YES,
+			@"kNotifications": @YES,
+			@"kDelay": @1.0f,
+			@"kMaxCount": @100,
+			@"kSaveInterval": @5,
+			@"kLives": @0,
+			@"kCount": @0,
+			@"kSoundFile": @"Powerup.wav",
+			@"kApps": @[],
+		};
+		prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.wrp1002.notiflives"];
+		[prefs registerDefaults:defaultPrefs];
+	}
+}
+
 
 //	=========================== Other vars ===========================
 
 int startupDelay = 10;
-HBPreferences *preferences;
 
 //	=========================== Classes / Functions ===========================
 
 void SaveCount() {
 	//[Debug Log:@"Saving count"];
-	[preferences setInteger:count forKey:@"kCount"];
+	[prefs setInteger:count forKey:@"kCount"];
+	[prefs synchronize];
 }
 
 void SaveLives() {
 	//[Debug Log:@"Saving lives"];
-	[preferences setInteger:lives forKey:@"kLives"];
+	[prefs setInteger:lives forKey:@"kLives"];
+	[prefs synchronize];
 }
 
 
@@ -101,7 +123,7 @@ void UpdateLives() {
 			NCNotificationRequest *notif = arg1;
 			NSString *bundleID = [notif sectionIdentifier];
 
-			if (allEnabled || [SparkAppList doesIdentifier:BUNDLE andKey:@"kApps" containBundleIdentifier:bundleID]) {
+			if (allEnabled || [selectedApps containsObject:bundleID]) {
 				//[Debug Log:[NSString stringWithFormat:@"New notification from: %@", bundleID]];
 				UpdateLives();
 			}
@@ -121,7 +143,7 @@ void UpdateLives() {
 			NCNotificationRequest *notif = arg1;
 			NSString *bundleID = [notif sectionIdentifier];
 
-			if (allEnabled || [SparkAppList doesIdentifier:BUNDLE andKey:@"kApps" containBundleIdentifier:bundleID]) {
+			if (allEnabled || [selectedApps containsObject:bundleID]) {
 				//[Debug Log:[NSString stringWithFormat:@"New notification from: %@", bundleID]];
 				UpdateLives();
 			}
@@ -133,27 +155,40 @@ void UpdateLives() {
 
 //	=========================== Constructor stuff ===========================
 
+static void UpdatePrefs() {
+	enabled = [prefs boolForKey: @"kEnabled"];
+	allEnabled = [prefs boolForKey: @"kAllEnabled"];
+	showNotifications = [prefs boolForKey: @"kNotifications"];
+
+	delayTime = [prefs floatForKey:@"kDelay"];
+
+	maxCount = [prefs integerForKey:@"kMaxCount"];
+	saveInterval = [prefs integerForKey:@"kSaveInterval"];
+	lives = [prefs integerForKey:@"kLives"];
+	count = [prefs integerForKey:@"kCount"];
+
+	soundFileName = [prefs stringForKey:@"kSoundFile"];
+	selectedApps = [prefs objectForKey:@"kApps"];
+}
+
+static void PrefsChangeCallback(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
+	UpdatePrefs();
+}
+
 %ctor {
 	//[Debug Log:[NSString stringWithFormat:@"============== %@ started ==============", TWEAK_NAME]];
 
+	InitPrefs();
+	UpdatePrefs();
 
-	preferences = [[HBPreferences alloc] initWithIdentifier:BUNDLE];
-
-	if ((NSString *)[preferences objectForKey:@"kSoundFile"] == nil)
-		[preferences setObject:@"Powerup.wav" forKey:@"kSoundFile"];
-
-    [preferences registerBool:&enabled default:YES forKey:@"kEnabled"];
-	[preferences registerBool:&allEnabled default:YES forKey:@"kAllEnabled"];
-	[preferences registerBool:&showNotifications default:YES forKey:@"kNotifications"];
-
-	[preferences registerFloat:&delayTime default:1.0f forKey:@"kDelay"];
-
-	[preferences registerInteger:&maxCount default:100 forKey:@"kMaxCount"];
-	[preferences registerInteger:&saveInterval default:5 forKey:@"kSaveInterval"];
-	lives = [preferences integerForKey:@"kLives" default:0];
-	count = [preferences integerForKey:@"kCount" default:0];
-
-	[preferences registerObject:&soundFileName default:@"Powerup.wav" forKey:@"kSoundFile"];
+	CFNotificationCenterAddObserver(
+		CFNotificationCenterGetDarwinNotifyCenter(),
+		NULL,
+		&PrefsChangeCallback,
+		CFSTR(PREFS_RELOAD),
+		NULL,
+		0
+	);
 
 	//	Wait a few seconds to start watching for new notifications in case of old notifications from before respring
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, startupDelay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{

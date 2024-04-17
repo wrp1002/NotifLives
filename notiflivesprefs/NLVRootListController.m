@@ -11,7 +11,7 @@
 	//In this array you should add the IDs of all the specifiers you are going to hide & show.
 	//Do not include the IDs of the cells you will reinsert them under.
 	//Notice I only included "cellID" and not "switchID".
-	NSArray *chosenIDs = @[@"kSelectButton"];
+	NSArray *chosenIDs = @[@"kApps"];
 	self.savedSpecifiers = (self.savedSpecifiers) ?: [[NSMutableDictionary alloc] init];
 	for(PSSpecifier *specifier in _specifiers) {
 		if([chosenIDs containsObject:[specifier propertyForKey:@"id"]]) {
@@ -31,22 +31,26 @@
 	NSString *key = [specifier propertyForKey:@"key"];
 	if([key isEqualToString:@"kAllEnabled"]) {
 		if([value boolValue])
-			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
-		else if(![self containsSpecifier:self.savedSpecifiers[@"kSelectButton"]])
-			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] afterSpecifierID:@"kAllEnabled" animated:YES];
+			[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
+		else if(![self containsSpecifier:self.savedSpecifiers[@"kApps"]])
+			[self insertContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] afterSpecifierID:@"kAllEnabled" animated:YES];
 	}
 }
 
 -(void)reloadSpecifiers {
-  [super reloadSpecifiers];
+	[super reloadSpecifiers];
 
-  //Since we don't have access to a specific specifier and value like in the previous step, we just have to read our preferences file.
-  //I check if our switchKey is NO, then hide the specifier
-  //Customize this to however you get your preferences, whether is directly from a plist or Cephei.
-  HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.wrp1002.notiflives"];
-  if([preferences boolForKey:@"kAllEnabled" default:true]) {
-    [self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kSelectButton"]] animated:YES];
-  }
+	//Since we don't have access to a specific specifier and value like in the previous step, we just have to read our preferences file.
+	//I check if our switchKey is NO, then hide the specifier
+	//Customize this to however you get your preferences, whether is directly from a plist or Cephei.
+
+	NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:BUNDLE];
+	NSDictionary *defaultPrefs = @{@"kAllEnabled": @YES};
+	[prefs registerDefaults:defaultPrefs];
+
+	if ([prefs integerForKey:@"kAllEnabled"]) {
+		[self removeContiguousSpecifiers:@[self.savedSpecifiers[@"kApps"]] animated:YES];
+	}
 }
 
 -(void)viewDidLoad {
@@ -56,7 +60,16 @@
 
 
 -(void)Respring {
-    [HBRespringController respring];
+	// From Cephei since other methods I tried didn't work
+	[[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/FrontBoardServices.framework"] load];
+	[[NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/SpringBoardServices.framework"] load];
+
+	Class $FBSSystemService = NSClassFromString(@"FBSSystemService");
+	Class $SBSRelaunchAction = NSClassFromString(@"SBSRelaunchAction");
+	if ($FBSSystemService && $SBSRelaunchAction) {
+		SBSRelaunchAction *restartAction = [$SBSRelaunchAction actionWithReason:@"RestartRenderServer" options:SBSRelaunchActionOptionsFadeToBlackTransition targetURL:nil];
+		[[$FBSSystemService sharedService] sendActions:[NSSet setWithObject:restartAction] withResult:nil];
+	}
 }
 
 -(void)OpenGithub {
@@ -100,35 +113,44 @@
 }
 
 -(void)ResetSettings {
-	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"];
+	NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:BUNDLE];
 
+	// Save life and count to set them after
 	NSInteger lives = [prefs integerForKey:@"kLives"];
 	NSInteger count = [prefs integerForKey:@"kCount"];
 
-	[prefs removeAllObjects];
+	NSArray *allKeys = [prefs dictionaryRepresentation].allKeys;
+	for (NSString *key in allKeys) {
+		[prefs removeObjectForKey:key];
+	}
 
 	[prefs setInteger:lives forKey:@"kLives"];
 	[prefs setInteger:count forKey:@"kCount"];
+
+	[prefs synchronize];
 
 	[self reloadSpecifiers];
 	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(BUNDLE_NOTIFY), nil, nil, true);
 }
 
 -(void)ResetLives {
-	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier: @"com.wrp1002.notiflives"];
+	NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:BUNDLE];
+	[prefs removeObjectForKey:@"kLives"];
+	[prefs removeObjectForKey:@"kCount"];
 
-	[prefs setInteger:0 forKey:@"kLives"];
-	[prefs setInteger:0 forKey:@"kCount"];
-
-	//NSFileManager *fm = [NSFileManager defaultManager];
-	//[fm removeItemAtPath: @"/var/mobile/Library/Preferences/com.wrp1002.notiflives.plist" error: nil];
-
-	[self Respring];
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(BUNDLE_NOTIFY), nil, nil, true);
 }
 
 -(void)ResetAll {
-	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:BUNDLE];
-	[prefs removeAllObjects];
+	NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:BUNDLE];
+
+	NSArray *allKeys = [prefs dictionaryRepresentation].allKeys;
+
+	for (NSString *key in allKeys) {
+		[prefs removeObjectForKey:key];
+	}
+	[prefs synchronize];
+
 	[self reloadSpecifiers];
 	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR(BUNDLE_NOTIFY), nil, nil, true);
 }
@@ -165,11 +187,12 @@
 
 	[self.view endEditing:YES];
 
-	HBPreferences *preferences;
-	preferences = [[HBPreferences alloc] initWithIdentifier:BUNDLE];
+	NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:BUNDLE];
+	NSDictionary *defaultPrefs = @{@"kSoundFile": @"Powerup.wav"};
+	[prefs registerDefaults:defaultPrefs];
 
 	NSString *dir = ROOT_PATH_NS(@"/Library/NotifLives/Sounds/");
-	NSString *fileName = (NSString *)[preferences objectForKey:@"kSoundFile"];
+	NSString *fileName = [prefs stringForKey:@"kSoundFile"];
 	fileName = [NSString stringWithFormat:@"%@%@", dir, fileName];
 
 	SystemSoundID sound;
@@ -201,13 +224,6 @@
 
 		[[self GetKeyWindow].rootViewController presentViewController:alert animated:YES completion:nil];
 	}
-}
-
--(void)SelectApps {
-    SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.wrp1002.notiflives" andKey:@"kApps"];
-
-    [self.navigationController pushViewController:s animated:YES];
-    self.navigationItem.hidesBackButton = FALSE;
 }
 
 @end

@@ -1,6 +1,6 @@
 THEOS_DEVICE_IP = 10.0.0.130
 GO_EASY_ON_ME = 1
-#THEOS_PACKAGE_SCHEME=rootless
+THEOS_PACKAGE_SCHEME=rootless
 # GET OLDABI!!!
 
 PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
@@ -8,15 +8,16 @@ PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
 
 INSTALL_TARGET_PROCESSES = SpringBoard
 
+
 ifeq ($(THEOS_PACKAGE_SCHEME),rootless)
 	ARCHS = arm64 arm64e
 	TARGET = iphone:clang:15.5:15.0
 else
-	ARCHS = arm64 arm64e
+	ARCHS = armv7 arm64 arm64e
 	TARGET = iphone:clang:14.2:8.0
 endif
 
-export ARCHS TARGET INSTALL_TARGET_PROCESSES
+#export ARCHS TARGET INSTALL_TARGET_PROCESSES
 include $(THEOS)/makefiles/common.mk
 
 SDKVERSION = 16.5
@@ -24,8 +25,7 @@ TWEAK_NAME = NotifLives
 
 $(TWEAK_NAME)_FILES = Tweak.x
 $(TWEAK_NAME)_CFLAGS = -fobjc-arc
-$(TWEAK_NAME)_EXTRA_FRAMEWORKS += Cephei
-$(TWEAK_NAME)_LIBRARIES = sparkapplist
+$(TWEAK_NAME)_EXTRA_FRAMEWORKS += AltList
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += notiflivesprefs

@@ -56,15 +56,32 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSButtonCell</string>
+			<string>PSLinkListCell</string>
+			<key>detail</key>
+			<string>ATLApplicationListMultiSelectionController</string>
+			<key>defaults</key>
+			<string>com.wrp1002.notiflives</string>
 			<key>key</key>
-			<string>kSelectButton</string>
+			<string>kApps</string>
 			<key>id</key>
-			<string>kSelectButton</string>
+			<string>kApps</string>
 			<key>label</key>
-			<string>Select Apps...</string>
-			<key>action</key>
-			<string>SelectApps</string>
+			<string>Select Apps</string>
+			<key>sections</key>
+			<array>
+				<dict>
+					<key>sectionType</key>
+					<string>Visible</string>
+				</dict>
+			</array>
+			<key>showIdentifiersAsSubtitle</key>
+			<true/>
+			<key>defaultApplicationSwitchValue</key>
+			<false/>
+			<key>useSearchBar</key>
+			<true/>
+			<key>PostNotification</key>
+			<string>com.wrp1002.notiflives/ReloadPrefs</string>
 		</dict>
 
 		<dict>
@@ -230,7 +247,7 @@
 				<key>confirmation</key>
 				<dict>
 					<key>prompt</key>
-					<string>Are you sure? This will respring your device.</string>
+					<string>Are you sure you want to reset your settings?</string>
 					<key>title</key>
 					<string>Reset!</string>
 					<key>cancelTitle</key>
@@ -249,7 +266,7 @@
 				<key>confirmation</key>
 				<dict>
 					<key>prompt</key>
-					<string>Are you sure? This will respring your device.</string>
+					<string>Are you sure you want to reset your life count to 0?</string>
 					<key>title</key>
 					<string>Reset!</string>
 					<key>cancelTitle</key>
@@ -268,7 +285,7 @@
 				<key>confirmation</key>
 				<dict>
 					<key>prompt</key>
-					<string>Are you sure? This will respring your device.</string>
+					<string>Are you sure you want to reset everything, including your life count?</string>
 					<key>title</key>
 					<string>Reset!</string>
 					<key>cancelTitle</key>
